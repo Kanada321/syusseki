@@ -43,12 +43,10 @@ const Home: NextPage = () => {
         axiosApi
           .post('/login', loginForm)
           .then((response: AxiosResponse) => {
-            console.log('ss');
             console.log(response.data);
-             router.push('/memos');
+            router.push('/memos');
           })
           .catch((err: AxiosError) => {
-            console.log('sse');
             console.log(err.response);
           });
       });

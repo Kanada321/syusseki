@@ -1,7 +1,55 @@
+import { AxiosError, AxiosResponse } from 'axios';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import { ChangeEvent, useState } from 'react';
 import { RequiredMark } from '../../components/RequiredMark';
+import { axiosApi } from '../../lib/axios';
+
+// POSTデータの型
+type MemoForm = {
+  tile: string;
+  body: string;
+};
 
 const Post: NextPage = () => {
+  // ルーター定義
+  const router = useRouter();
+  // state定義
+  const [memoForm, setMemoForm] = useState<MemoForm>({
+    tile: '',
+    body: '',
+  });
+  const [validation, setValidation] = useState<MemoForm>({
+    tile: '',
+    body: '',
+  });
+
+  // POSTデータの更新
+  const updateMemoForm = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setMemoForm({ ...memoForm, [e.target.name]: e.target.value });
+  };
+
+  // メモの登録
+  const createMemo = () => {
+    axiosApi
+      // CSRF保護の初期化
+      .get('/sanctum/csrf-cookie')
+      .then((res) => {
+        // APIへのリクエスト
+        axiosApi
+          .post('/api/memos', memoForm)
+          .then((response: AxiosResponse) => {
+            console.log(response.data);
+            router.push('/memos');
+          })
+          .catch((err: AxiosError) => {
+            console.log(err.response);
+          });
+      });
+  };
+
   return (
     <div className='w-2/3 mx-auto'>
       <div className='w-1/2 mx-auto mt-32 border-2 px-12 py-16 rounded-2xl'>
